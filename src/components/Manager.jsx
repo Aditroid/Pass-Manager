@@ -13,10 +13,12 @@ const Manager = () => {
     const [passwordArray, setPasswordArray] = useState([])
     const [showPasswordId, setShowPasswordId] = useState(null)
 
+const API_URL = import.meta.env.VITE_API_URL || 'https://passwordmanager-lt9g.onrender.com';
+
 const getPasswords = async () => {
     try {
         console.log('Fetching passwords...');
-        const response = await fetch("https://passwordmanager-lt9g.onrender.com");
+        const response = await fetch(API_URL);
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.error || 'Failed to fetch passwords');
@@ -91,7 +93,7 @@ const getPasswords = async () => {
 
             // If it's an edit, remove the old entry
             if (form.id) {
-                const deleteResponse = await fetch("https://passwordmanager-lt9g.onrender.com", { 
+                const deleteResponse = await fetch(DELETE_API_URL, { 
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" }, 
                     body: JSON.stringify({ id: form.id })
@@ -104,7 +106,7 @@ const getPasswords = async () => {
             }
 
             // Save the new/updated password
-            const response = await fetch("https://passwordmanager-lt9g.onrender.com", { 
+            const response = await fetch(API_URL, { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" }, 
                 body: JSON.stringify(passwordData)
@@ -152,7 +154,7 @@ const getPasswords = async () => {
         const confirmDelete = window.confirm("Do you really want to delete this password?");
         if (!confirmDelete) return;
 
-        const response = await fetch("https://passwordmanager-lt9g.onrender.com", { 
+        const response = await fetch(API_URL, { 
             method: "DELETE",
             headers: { "Content-Type": "application/json" }, 
             body: JSON.stringify({ id })
