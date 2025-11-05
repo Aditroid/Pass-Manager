@@ -14,9 +14,35 @@ const collectionName = 'passwords';
 const app = express()
 const port = 3000;
 
-// Middleware
-app.use(cors());
+// Configure CORS with specific origins
+const allowedOrigins = [
+    'http://localhost:5173',  // Vite default dev server
+    'http://localhost:3000',  // Common React dev server
+    'https://your-vercel-app.vercel.app'  // Your Vercel frontend URL
+];
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+// Apply CORS with options
+app.use(cors(corsOptions));
 app.use(bodyparser.json());
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 
 // Connect to MongoDB
 let db, collection;

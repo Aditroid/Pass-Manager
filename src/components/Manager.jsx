@@ -16,7 +16,7 @@ const Manager = () => {
 const getPasswords = async () => {
     try {
         console.log('Fetching passwords...');
-        const response = await fetch("http://localhost:3000/");
+        const response = await fetch("https://passwordmanager-lt9g.onrender.com");
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.error || 'Failed to fetch passwords');
@@ -91,7 +91,7 @@ const getPasswords = async () => {
 
             // If it's an edit, remove the old entry
             if (form.id) {
-                const deleteResponse = await fetch("http://localhost:3000/", { 
+                const deleteResponse = await fetch("https://passwordmanager-lt9g.onrender.com", { 
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" }, 
                     body: JSON.stringify({ id: form.id })
@@ -104,7 +104,7 @@ const getPasswords = async () => {
             }
 
             // Save the new/updated password
-            const response = await fetch("http://localhost:3000/", { 
+            const response = await fetch("https://passwordmanager-lt9g.onrender.com", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" }, 
                 body: JSON.stringify(passwordData)
@@ -152,7 +152,7 @@ const getPasswords = async () => {
         const confirmDelete = window.confirm("Do you really want to delete this password?");
         if (!confirmDelete) return;
 
-        const response = await fetch("http://localhost:3000/", { 
+        const response = await fetch("https://passwordmanager-lt9g.onrender.com", { 
             method: "DELETE",
             headers: { "Content-Type": "application/json" }, 
             body: JSON.stringify({ id })
