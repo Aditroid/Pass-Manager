@@ -18,15 +18,31 @@ const port = process.env.PORT || 3000;
 const allowedOrigins = [
     'http://localhost:5173',  // Vite default dev server
     'http://localhost:3000',  // Common React dev server
-    'https://your-vercel-app.vercel.app'  // Your Vercel frontend URL
+    'https://password-manager-frontend-*.vercel.app',  // Vercel preview deployments
+    'https://password-manager-frontend-*.vercel.app',  // Your Vercel frontend URL (replace with your actual URL)
+    'https://*.vercel.app'    // Allow all Vercel deployments
 ];
 
 const corsOptions = {
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
+        if (!origin) {
+            console.log('No origin - allowing request');
+            return callback(null, true);
+        }
         
-        if (allowedOrigins.indexOf(origin) === -1) {
+        // Check if the origin is in the allowed list or matches a wildcard pattern
+        const isAllowed = allowedOrigins.some(allowedOrigin => {
+            if (allowedOrigin.includes('*')) {
+                const regex = new RegExp(allowedOrigin.replace('.', '\.').replace('*', '.*'));
+                return regex.test(origin);
+            }
+            return allowedOrigin === origin;
+        });
+        
+        if (!isAllowed) {
+            console.error('CORS Error: Origin not allowed -', origin);
+            console.log('Allowed origins:', allowedOrigins);
             const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
             return callback(new Error(msg), false);
         }
