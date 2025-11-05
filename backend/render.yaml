@@ -2,10 +2,7 @@ services:
   - type: web
     name: password-manager-backend
     env: node
-    buildCommand: |
-      npm install
-      cd ..
-      npm install
+    buildCommand: npm install
     startCommand: node server.js
     envVars:
       - key: MONGODB_URI
@@ -13,4 +10,4 @@ services:
           name: password-manager-db
           property: connectionString
       - key: PORT
-        value: 10000
+        value: 10000  # This line ensures the port is set
