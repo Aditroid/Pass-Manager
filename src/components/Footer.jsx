@@ -2,7 +2,7 @@ import React from 'react'
 
 const Footer = () => {
     return (
-        <div className=' text-white flex flex-col justify-center items-center  w-full'>
+        <div className=' text-white flex flex-col justify-center items-center w-full'>
             <div className="logo font-bold text-white">
                 <span className='text-[#44229f]'>&#8473;</span>
                 <span>ass</span><span className='text-[#44229f]'>Manager</span>

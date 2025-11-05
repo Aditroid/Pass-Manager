@@ -4,12 +4,13 @@ import Manager from './components/Manager'
 import Navbar from './components/Navbar'
 
 function App() {
-
   return (
-    <div className=" inset-0 -z-10 h-[100%] w-full bg-white [background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#63e_100%)]">
+    <div className="min-h-0 flex flex-col h-screen">
       <Navbar />
-      <Manager />
-      <Footer />
+      <div className="flex-1 overflow-auto">
+        <Manager />
+        <Footer className="mt-auto" />
+      </div>
     </div>
   )
 }

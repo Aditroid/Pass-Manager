@@ -202,7 +202,7 @@ const getPasswords = async () => {
 
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="h-[89vh]">
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
