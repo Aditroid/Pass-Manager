@@ -47,18 +47,37 @@ app.options('*', cors(corsOptions));
 // Connect to MongoDB
 let db, collection;
 
+async function getCollection() {
+    if (!client.topology || !client.topology.isConnected()) {
+        await client.connect();
+    }
+    if (!db) {
+        db = client.db(dbName);
+    }
+    if (!collection) {
+        collection = db.collection(collectionName);
+        // Create an index on the id field
+        try {
+            await collection.createIndex({ id: 1 }, { unique: true });
+            console.log('Created index on id field');
+        } catch (error) {
+            if (error.codeName !== 'IndexOptionsConflict') {
+                console.error('Error creating index:', error);
+                throw error;
+            }
+            // Index already exists, which is fine
+        }
+    }
+    return collection;
+}
+
 async function connectToMongo() {
     try {
         await client.connect();
         console.log('Connected to MongoDB Atlas');
-        db = client.db(dbName);
-        collection = db.collection(collectionName);
-        
-        // Create index on id field for faster lookups
-        await collection.createIndex({ id: 1 }, { unique: true });
-        console.log('Database connection and index setup complete');
+        await getCollection(); // Initialize collection
     } catch (error) {
-        console.error('MongoDB connection error:', error);
+        console.error('Error connecting to MongoDB:', error);
         process.exit(1);
     }
 }
@@ -71,15 +90,15 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK', dbStatus: client.topology.isConnected() ? 'connected' : 'disconnected' });
 });
 
-// Get all Passwords
+// Get all passwords
 app.get('/', async (req, res) => {
     try {
-        const findResult = await collection.find({}).toArray();
-        console.log('Found documents:', findResult.length);
-        res.json(findResult);
+        const collection = await getCollection();
+        const passwords = await collection.find({}).toArray();
+        res.json(passwords);
     } catch (error) {
         console.error('Error fetching passwords:', error);
-        res.status(500).json({ error: 'Failed to fetch passwords' });
+        res.status(500).json({ error: 'Failed to fetch passwords', details: error.message });
     }
 });
 
@@ -93,6 +112,7 @@ app.post('/', async (req, res) => {
             return res.status(400).json({ success: false, error: 'Missing required fields' });
         }
         
+        const collection = await getCollection();
         const result = await collection.insertOne({
             ...password,
             createdAt: new Date(),
@@ -103,13 +123,14 @@ app.post('/', async (req, res) => {
         res.status(201).json({ success: true, id: result.insertedId });
     } catch (error) {
         console.error('Error saving password:', error);
-        res.status(500).json({ success: false, error: 'Failed to save password' });
+        res.status(500).json({ success: false, error: 'Failed to save password', details: error.message });
     }
 });
 
 // Delete the password
 app.delete('/', async (req, res) => {
     try {
+        const collection = await getCollection();
         const { id } = req.body;
         console.log('Deleting password with id:', id);
         
@@ -121,13 +142,13 @@ app.delete('/', async (req, res) => {
         console.log('Delete result:', result);
         
         if (result.deletedCount === 0) {
-            return res.status(404).json({ success: false, error: 'Password not found' });
+            return res.status(404).json({ error: 'Password not found' });
         }
         
-        res.json({ success: true, deletedCount: result.deletedCount });
+        res.json({ message: 'Password deleted successfully' });
     } catch (error) {
         console.error('Error deleting password:', error);
-        res.status(500).json({ success: false, error: 'Failed to delete password' });
+        res.status(500).json({ error: 'Failed to delete password', details: error.message });
     }
 });
 
