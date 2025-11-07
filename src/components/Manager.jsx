@@ -222,6 +222,7 @@ const getPasswords = async () => {
                         ass<span className="text-[#5e3eb1]">Manager</span>
                     </h1>
                     <p className="text-gray-600">Your secure password vault</p>
+                    <p className="text-sm text-gray-500 mt-1">Note: The backend is hosted on Render's free tier, which may take 15-20 seconds to start up if inactive. If you don't see your passwords, please wait a moment and refresh the page.</p>
                 </div>
 
                 <div className="bg-white rounded-lg shadow-md p-6 mb-8">
